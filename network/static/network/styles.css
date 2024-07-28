@@ -1,0 +1,23 @@
+.addpost{
+    width: 50%;
+    position: absolute;
+    left: 20%
+}
+.enterpost{
+    border: 1px solid rgb(214, 211, 211);
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px;
+}
+.allpost{
+    border: 1px solid rgb(214, 211, 211);
+    border-radius: 10px;
+    padding: 45px;
+    margin: 10px;
+}
+.user_data{
+    border: 1px solid rgb(214, 211, 211);
+    border-radius: 7px;
+    padding: 15px;
+    width: 250px;
+}

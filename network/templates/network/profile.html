@@ -1,0 +1,65 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+<section class="addpost my-3 mx-5">
+{% for post in post %}
+<div class="allpost my-3 mx-5">
+    <p><strong>{{post.user}}</strong> &nbsp {{post.timestamp}}</p>
+    <hr>
+    <div id="content_edit{{ post.id }}">
+        {{post.post}}
+    </div>
+    {% if user.is_authenticated %}
+    {% if user == post.user %}
+    <button type="submit" class="btn btn-sm btn-outline-info float-right" id="edit{{post.id}}" onclick="toggle({{post.id}})">Edit</button>
+    <textarea hidden class="form-control" id="edit_text{{post.id}}">{{post.post}}</textarea>
+    <br/>
+    <button hidden type="submit" class="btn btn-sm btn-outline-success float-left" id="save{{post.id}}" onclick="edit_content({{post.id}})">Save</button>
+    <button hidden type="submit" class="btn btn-sm btn-outline-dark float-right" id="cancel{{post.id}}" onclick="cancel({{post.id}})">Cancel</button>
+    {% endif %}
+    <br>
+    <div class="float-left" id="post_liked{{post.id}}">
+    {{post.likes.count}}
+     </div>
+    {% if post.id in liked %}
+    <button class="btn btn-sm btn-outline-light float-left fa fa-heart" onclick="like({{post.id}},{{liked}})" style="font-size:15px;color:red" id="like{{post.id}}"></button>
+    {% else %}
+    <button class="btn btn-sm btn-outline-light float-left fa fa-heart" onclick="like({{post.id}},{{liked}})" style="font-size:15px;color:black" id="like{{post.id}}" ></button>
+    {% endif %}
+    {% endif %}
+</div>
+{% endfor %}
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+       {% if post.has_previous %}
+      <li class="page-item"><a class="page-link" href="?page={{ post.previous_page_number }}">Previous</a></li>
+      {% endif %}
+      {% for pages in post.paginator.page_range %}
+      <li class="page-item"><a class="page-link" href="?page={{ pages }}">{{pages}}</a></li>
+       {% endfor %}
+      {% if post.has_next %}
+      <li class="page-item"><a class="page-link" href="?page={{ post.next_page_number}}">Next</a></li>
+      {% endif %}
+    </ul>
+  </nav>
+</section>
+<div class="user_data my-3 mx-5">
+    <div class="col">
+    <p><strong>User: &nbsp</strong>{{username}}</p>
+    <p><strong>Followers: &nbsp</strong>{{profile_user.follower.count}}</p>
+    <p><strong>Following: &nbsp</strong>{{profile_user.following.count}}</p>
+    </div>
+    {% if user.is_authenticated%}
+    {% if user.username != username.username %}
+    <form action="{% url 'profile' username.id %}" method="post" >
+        {% csrf_token %}
+        {% if following %}
+        &nbsp&nbsp&nbsp<input name="follow" type="submit" class="btn btn-sm btn-outline-danger" id="follow" value ="UnFollow">
+    {% else %}
+    &nbsp&nbsp&nbsp<input name="unfollow" type="submit" class="btn btn-sm btn-outline-primary" id="follow" value = "Follow">
+    {% endif %}
+    </form>
+    {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

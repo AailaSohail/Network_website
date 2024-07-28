@@ -1,0 +1,37 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+<h1>Following</h1>
+<section class="addpost my-3 mx-5">
+    {% for post in post %}
+<div class="allpost my-3 mx-5">
+    <p><a href="{% url 'profile' post.user.id %}"><strong>{{post.user}}</strong></a> &nbsp {{post.timestamp}}</p>
+    <hr>
+{{post.post}}
+<br>
+<br>
+<div class="float-left" id="post_liked{{post.id}}">
+  {{post.likes.count}}
+   </div>
+{% if post.id in liked %}
+<button class="btn btn-sm btn-outline-light float-left fa fa-heart" onclick="like({{post.id}},{{liked}})" style="font-size:15px;color:red" id="like{{post.id}}"></button>
+{% else %}
+<button class="btn btn-sm btn-outline-light float-left fa fa-heart" onclick="like({{post.id}},{{liked}})" style="font-size:15px;color:black" id="like{{post.id}}" ></button>
+{% endif %}
+</div>
+{% endfor %}
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+       {% if post.has_previous %}
+      <li class="page-item"><a class="page-link" href="?page={{ post.previous_page_number }}">Previous</a></li>
+      {% endif %}
+      {% for pages in post.paginator.page_range %}
+      <li class="page-item"><a class="page-link" href="?page={{ pages }}">{{pages}}</a></li>
+       {% endfor %}
+      {% if post.has_next %}
+      <li class="page-item"><a class="page-link" href="?page={{ post.next_page_number}}">Next</a></li>
+      {% endif %}
+    </ul>
+  </nav>
+</section>
+{% endblock %}

@@ -1,0 +1,123 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{% block title %}Social Network{% endblock %}</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <link href="{% static 'network/styles.css' %}" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link href="{% static 'network/index.js' %}">
+        <link rel="shortcut icon" href="#" />
+        <script>
+            function toggle(id) {
+              let element = document.getElementById(`edit_text${id}`);
+              let save = document.getElementById(`save${id}`);
+              let cancel = document.getElementById(`cancel${id}`);
+              element.removeAttribute("hidden");
+              save.removeAttribute("hidden");
+              cancel.removeAttribute("hidden");
+              let edit = document.getElementById(`edit${id}`);
+              document.querySelector(`#content_edit${id}`).style.display = 'none';
+              edit.setAttribute("hidden", "hidden");
+            }
+          
+            function cancel(id) {
+              let element = document.getElementById(`edit_text${id}`);
+              let save = document.getElementById(`save${id}`);
+              let cancel = document.getElementById(`cancel${id}`);
+              element.setAttribute("hidden", "hidden");
+              save.setAttribute("hidden", "hidden");
+              cancel.setAttribute("hidden", "hidden");
+              let edit = document.getElementById(`edit${id}`);
+              document.querySelector(`#content_edit${id}`).style.display = 'block';
+              edit.removeAttribute("hidden");
+            }
+          
+            function getCookie(name){
+              const value = `; ${document.cookie}`;
+              const parts = value.split(`; ${name}=`);
+              if(parts.length == 2) return parts.pop().split(';').shift();
+            }
+          
+            function edit_content(id){
+              const textcontent = document.getElementById(`edit_text${id}`).value
+              fetch(`/edit/${id}`, {
+                method: 'POST',
+                headers: {"Content-type": "application/json", "X-CSRFToken": getCookie("csrftoken")},
+                body: JSON.stringify({
+                    post: textcontent,
+                })
+              })
+              .then(response => response.json())
+              .then(result => {
+                  document.querySelector(`#content_edit${id}`).innerHTML = result.data
+                  cancel(id);
+              });
+            }
+          
+            function like(id,liked){
+              let button = document.querySelector(`#like${id}`)
+              if(liked.indexOf(id)>=0){
+                var like = true;
+              }
+              else{
+                var like = false;
+              }
+              if(like === true){
+                button.style.color="black";
+              }
+              else{
+                button.style.color="red";
+              }
+              fetch(`/like/${id}`)
+              .then(response => response.json())
+              .then(result => {
+                document.querySelector(`#post_liked${id}`).innerHTML = result.count
+                button.style.color=result.color
+                console.log(result.message)
+              });
+              like =!like
+            }
+          </script> 
+    </head>
+    <body>
+
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="{% url 'index' %}">Network</a>
+          
+            <div>
+              <ul class="navbar-nav mr-auto">
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'profile' request.user.id %}"><strong>{{ user.username }}</strong></a>
+                    </li>
+                {% endif %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'index' %}">All Posts</a>
+                </li>
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'following' %}">Following</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Log In</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'register' %}">Register</a>
+                    </li>
+                {% endif %}
+              </ul>
+            </div>
+          </nav>
+        
+        <div class="body">
+            {% block body %}
+            {% endblock %}
+        </div>
+    </body>
+</html>
